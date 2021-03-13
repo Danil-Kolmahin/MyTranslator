@@ -1,0 +1,26 @@
+{
+  "name": "mytranslator",
+  "version": "1.0.0",
+  "description": "The free MyTranslator service allows you to instantly translate words, phrases and images from over 100 languages.",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "win": {
+      "icon": "sources/icon_512.ico"
+    }
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vitalets/google-translate-api": "^5.0.0",
+    "jest": "^26.6.3",
+    "tesseract.js": "^2.1.4"
+  },
+  "devDependencies": {
+    "electron": "^11.2.1",
+    "electron-builder": "^22.9.1"
+  }
+}
