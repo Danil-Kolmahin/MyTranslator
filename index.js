@@ -1,4 +1,4 @@
-const {app, BrowserWindow, clipboard, globalShortcut, Menu} = require('electron')
+const {app, BrowserWindow, clipboard, globalShortcut, Menu, ipcMain} = require('electron')
 const {getText} = require('./RAndT')
 
 const resultsArray = []
@@ -38,10 +38,13 @@ app.whenReady().then(() => {
     const menu = Menu.buildFromTemplate(template)
 
     let timeout
+    let textFromInput
 
     const recursive = () => {
         timeout = null
-        getText(resultsArray, clipboard)
+
+        ipcMain.once('input', (_, data) => textFromInput = data)
+        getText(resultsArray, clipboard, textFromInput)
             .then(res => {
                 resultsArray.push(res.text)
                 //console.log(resultsArray[resultsArray.length - 1])
@@ -52,6 +55,7 @@ app.whenReady().then(() => {
                 win.webContents.send('wantErr', errorsArray)
             })
             .finally(() => {
+                textFromInput = undefined
                 timeout = setTimeout(() => recursive(), 1500)
             })
     }

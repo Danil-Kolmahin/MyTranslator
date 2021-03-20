@@ -46,10 +46,16 @@ const getTextFromClipText = function (clipboard) {
     return {text: clipboard.readText(), error: ''}
 }
 
-const getText = async (array, clipboard) => {
+const getText = async (array, clipboard, textFromInput) => {
     let getTextFun
     let getBy
-    if (clipboard.readText() === '') {
+    if (textFromInput) {
+        getTextFun = (clipboard) => {
+            clipboard.writeText(textFromInput)
+            return textFromInput
+        }
+        getBy = 'getTextFromInput'
+    } else if (clipboard.readText() === '') {
         getTextFun = getTextFromClipImg
         getBy = 'getTextFromClipImg 📷'
     } else {

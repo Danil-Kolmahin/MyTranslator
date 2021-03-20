@@ -3,23 +3,24 @@ const { ipcRenderer } = require('electron')
 let array = []
 window.resultsArray = []
 
+document.querySelector('input').oninput = () =>
+    ipcRenderer.send('input', document.querySelector('input').value)
+
 ipcRenderer.on('wantLog', (event, data) => {
     array.forEach(child => child.remove())
     array = []
 
     window.resultsArray.push(data)
-    data.forEach((cur) => {
+    data.forEach((cur, i) => {
         const div = document.getElementById('target')
         const myDiv1 = document.createElement('div')
-        myDiv1.insertAdjacentHTML('afterbegin', `<b>${cur[0]}</b>`)
-        cur[1].forEach(text => text.slice(0, 1) === '+'
+        i !== data.length - 1 && myDiv1.insertAdjacentHTML('afterbegin', '<hr/>')
+        myDiv1.insertAdjacentHTML('beforeend', `<b>${cur[0]}</b>`)
+        cur[1].forEach((text) => text.slice(0, 1) === '+'
             ? myDiv1.insertAdjacentHTML('beforeend', `<br><u>${text.slice(2)}</u>`)
             : myDiv1.insertAdjacentHTML('beforeend', `<br><span>${text}</span>`))
-        //myDiv1.textContent = lastRes.translated
-        //myDiv1.innerHTML = lastRes.translated
         div.after(myDiv1)
         array.push(myDiv1)
-        //console.log(cur)
     })
 })
 
