@@ -19,7 +19,7 @@ ipcRenderer.on('wantLog', (event, data) => {
         //myDiv1.innerHTML = lastRes.translated
         div.after(myDiv1)
         array.push(myDiv1)
-        //console.log(lastRes)
+        //console.log(cur)
     })
 })
 

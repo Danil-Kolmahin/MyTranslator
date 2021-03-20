@@ -1,4 +1,3 @@
-const {takeQuestions} = require("./textWork");
 const {app, BrowserWindow, clipboard, globalShortcut, Menu} = require('electron')
 const {getText} = require('./RAndT')
 
@@ -29,8 +28,6 @@ app.on('activate', () => {
 app.whenReady().then(() => {
     createWindow()
 
-    const allQuestions = takeQuestions()
-
     const {commandsMap} = Menu.getApplicationMenu()
     const template = []
     for (const prop in commandsMap) {
@@ -44,7 +41,7 @@ app.whenReady().then(() => {
 
     const recursive = () => {
         timeout = null
-        getText(resultsArray, clipboard, allQuestions)
+        getText(resultsArray, clipboard)
             .then(res => {
                 resultsArray.push(res.text)
                 //console.log(resultsArray[resultsArray.length - 1])

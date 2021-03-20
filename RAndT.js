@@ -1,24 +1,18 @@
 const {createWorker} = require('tesseract.js')
-const translate = require('@vitalets/google-translate-api')
+// const translate = require('@vitalets/google-translate-api')
+const {takeQuestions} = require("./textWork");
+const {searchAndColor} = require("./textWork");
+const {search} = require("./textWork");
 
-const translateFromText = (findStr, allQuestions) => {
-    const search = (questions, findStr) => questions.filter(cur => cur[0].search(new RegExp(findStr)) !== -1)
-
-    const searchAndColor = (questions, findStr) => questions.map((cur, i, arr) => {
-        const pos = cur[0].search(new RegExp(findStr))
-        if (pos === -1) throw 'error in searchAndColor func'
-        const current = cur
-        current[0] = cur[0].slice(0, pos) + '<mark>' + cur[0].slice(pos, pos + findStr.length) + '</mark>' + cur[0].slice(pos + findStr.length)
-        return current
-    })
-
+const translateFromText = (findStr) => {
     //const { text } = await translate(findStr, {to: 'uk'})
     //findStr = text
     //console.log(findStr)
+    //const allQuestions = getQuestionsAfter()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     findStr.toLowerCase().trim()
     if (!findStr) findStr = '___'
     findStr.slice(0, findStr.length - 1)
-    let foundQuestions = search(allQuestions, findStr)
+    let foundQuestions = search(takeQuestions(), findStr)
     foundQuestions = searchAndColor(foundQuestions, findStr)
     //console.log(foundQuestions)
     return foundQuestions
@@ -52,7 +46,7 @@ const getTextFromClipText = function (clipboard) {
     return {text: clipboard.readText(), error: ''}
 }
 
-const getText = async (array, clipboard, allQuestions) => {
+const getText = async (array, clipboard) => {
     let getTextFun
     let getBy
     if (clipboard.readText() === '') {
@@ -74,7 +68,7 @@ const getText = async (array, clipboard, allQuestions) => {
 
     if (lastValue) if (lastValue.text === text) throw {error: 'Nothing new', date: new Date(), getBy}
 
-    const translated = translateFromText(text, allQuestions)
+    const translated = translateFromText(text)
     return {
         text,
         translated,
