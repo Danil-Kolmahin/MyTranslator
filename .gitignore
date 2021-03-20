@@ -6,4 +6,6 @@ node_modules
 
 eng.traineddata
 
+ukr.traineddata
+
 package-lock.json

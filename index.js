@@ -31,6 +31,20 @@ app.on('activate', () => {
 app.whenReady().then(() => {
     createWindow()
 
+    const fs = require('fs')
+
+    const filename = 'finalBig.txt'
+    const findStr = 'Кабінету Міністрів'
+
+    const fake = []
+
+    fs.readFile(filename, 'utf8', (err, data) => {
+        if (err) throw err
+        const allQuestions = data.trim().toLowerCase().split('.\n')
+        allQuestions.forEach((cur, i, arr) => fake[i] = cur.split('?\n'))
+        allQuestions.forEach((cur, i, arr) => fake[i][1] = cur[1] ? cur[1].split(';\n') : 'ERROR')
+    })
+
     //v8.setFlagsFromString('--no-flush-bytecode');
 
     const { commandsMap } = Menu.getApplicationMenu()
@@ -46,7 +60,7 @@ app.whenReady().then(() => {
 
     const recursive = () => {
         timeout = null
-        getText(resultsArray, clipboard)
+        getText(resultsArray, clipboard, fake)
             .then(res => {
                 resultsArray.push(res)
                 win.webContents.send('wantLog', resultsArray)

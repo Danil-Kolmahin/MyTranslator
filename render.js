@@ -1,12 +1,18 @@
 const { ipcRenderer } = require('electron')
 
+let array = []
+
 ipcRenderer.on('wantLog', (event, data) => {
+    array.forEach(child => child.remove())
+    array = []
+
     window.resultsArray = data
     const lastRes = data[data.length - 1]
     const div = document.getElementById('target')
-    const myH1 = document.createElement('h1')
+    const myH1 = document.createElement('li')
     myH1.textContent = lastRes.translated
     div.after(myH1)
+    array.push(myH1)
     console.log(lastRes)
 })
 
