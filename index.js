@@ -1,20 +1,18 @@
-const { app, BrowserWindow, clipboard, globalShortcut, ipcMain, Menu, MenuItem } = require('electron')
-const { getText } = require('./RAndT')
-
-//const v8 = require('v8')
+const {takeQuestions} = require("./textWork");
+const {app, BrowserWindow, clipboard, globalShortcut, Menu} = require('electron')
+const {getText} = require('./RAndT')
 
 const resultsArray = []
 const errorsArray = []
 let win
 
-function createWindow () {
+function createWindow() {
     win = new BrowserWindow({
-        x: 1112,
+        x: 986,
         y: 3,
-        width: 256,
+        width: 384,
         height: 1024,
         alwaysOnTop: true,
-        //icon: './sources/small_icon_64.ico',
         webPreferences: {
             nodeIntegration: true
         }
@@ -31,23 +29,9 @@ app.on('activate', () => {
 app.whenReady().then(() => {
     createWindow()
 
-    const fs = require('fs')
+    const allQuestions = takeQuestions()
 
-    const filename = 'finalBig.txt'
-    const findStr = 'Кабінету Міністрів'
-
-    const fake = []
-
-    fs.readFile(filename, 'utf8', (err, data) => {
-        if (err) throw err
-        const allQuestions = data.trim().toLowerCase().split('.\n')
-        allQuestions.forEach((cur, i, arr) => fake[i] = cur.split('?\n'))
-        allQuestions.forEach((cur, i, arr) => fake[i][1] = cur[1] ? cur[1].split(';\n') : 'ERROR')
-    })
-
-    //v8.setFlagsFromString('--no-flush-bytecode');
-
-    const { commandsMap } = Menu.getApplicationMenu()
+    const {commandsMap} = Menu.getApplicationMenu()
     const template = []
     for (const prop in commandsMap) {
         if (commandsMap.hasOwnProperty(prop)) {
@@ -60,10 +44,11 @@ app.whenReady().then(() => {
 
     const recursive = () => {
         timeout = null
-        getText(resultsArray, clipboard, fake)
+        getText(resultsArray, clipboard, allQuestions)
             .then(res => {
-                resultsArray.push(res)
-                win.webContents.send('wantLog', resultsArray)
+                resultsArray.push(res.text)
+                //console.log(resultsArray[resultsArray.length - 1])
+                win.webContents.send('wantLog', res.translated)
             })
             .catch(err => {
                 errorsArray.push(err)
@@ -79,4 +64,6 @@ app.whenReady().then(() => {
     Menu.setApplicationMenu(menu);
 })
 
-app.on('will-quit', () => {globalShortcut.unregisterAll()})
+app.on('will-quit', () => {
+    globalShortcut.unregisterAll()
+})

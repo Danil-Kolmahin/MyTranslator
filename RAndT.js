@@ -1,19 +1,16 @@
 const {createWorker} = require('tesseract.js')
 const translate = require('@vitalets/google-translate-api')
 
-const translateFromText = async (findStr, allQuestions) => {
-    const search = (questions, findStr) => {
-        return questions.filter(cur => cur[0].search(new RegExp(findStr)) !== -1)
-    }
+const translateFromText = (findStr, allQuestions) => {
+    const search = (questions, findStr) => questions.filter(cur => cur[0].search(new RegExp(findStr)) !== -1)
 
-    const searchAndColor = (questions, findStr) => {
-        return questions.map((cur, i, arr) => {
-            const pos = cur[0].search(new RegExp(findStr))
-            if (pos === -1) throw 'error in searchAndColor func'
-            cur[0] = arr[i][0].slice(0, pos) + '<mark>' + arr[i][0].slice(pos, pos + findStr.length) + '</mark>' + arr[i][0].slice(pos + findStr.length)
-            return cur
-        })
-    }
+    const searchAndColor = (questions, findStr) => questions.map((cur, i, arr) => {
+        const pos = cur[0].search(new RegExp(findStr))
+        if (pos === -1) throw 'error in searchAndColor func'
+        const current = cur
+        current[0] = cur[0].slice(0, pos) + '<mark>' + cur[0].slice(pos, pos + findStr.length) + '</mark>' + cur[0].slice(pos + findStr.length)
+        return current
+    })
 
     //const { text } = await translate(findStr, {to: 'uk'})
     //findStr = text
@@ -23,27 +20,16 @@ const translateFromText = async (findStr, allQuestions) => {
     findStr.slice(0, findStr.length - 1)
     let foundQuestions = search(allQuestions, findStr)
     foundQuestions = searchAndColor(foundQuestions, findStr)
+    //console.log(foundQuestions)
     return foundQuestions
 }
 
-let isWorkGetTextFromClipImg = false
-
 const getTextFromClipImg = async function (clipboard) {
-    // if (!isWorkGetTextFromClipImg) {
-    // isWorkGetTextFromClipImg = true
-    // if (clipboard.readText() !== '') throw 'Clipboard isn\'t empty' // don't helped
     let img
-    // try {
-    //     img = clipboard.readImage().toJPEG(70) // .toDataURL()
-    // } catch (e) {
-    //     throw {text: '', error: 'e'}
-    // }
-    // if (clipboard.readText() !== '') throw 'Clipboard isn\'t empty' // don't helped
     try {
         img = clipboard.readImage().toJPEG(70)
     } catch (e) {
         console.error(e)
-        // return getTextFromClipText(clipboard)
     }
     const worker = createWorker()
     await worker.load()
@@ -55,22 +41,14 @@ const getTextFromClipImg = async function (clipboard) {
         }
     }
     try {
-        //console.info('\x1b[36m' + (await worker.detect(img))+ '\x1b[0m')
         all = await worker.recognize(img)
-        // if (all.data.text === '') throw 'Clipboard isn\'t empty 2'
-    } catch (e) {
-        // throw {text: '', error: 'e1'}
     } finally {
         await worker.terminate()
-        // isWorkGetTextFromClipImg = false
     }
-    // console.log('\x1b[36m%s\x1b[0m', all.data.text)
     return {text: all.data.text, error: ''}
-    // }
 }
 
 const getTextFromClipText = function (clipboard) {
-    //if (clipboard.readText() === '') throw 'Clipboard is empty'
     return {text: clipboard.readText(), error: ''}
 }
 
@@ -90,20 +68,13 @@ const getText = async (array, clipboard, allQuestions) => {
     try {
         text = await getTextFun(clipboard)
         text = text.text.toLowerCase()
-        // console.log(text)
     } catch (e) {
         //throw {error: e, date: new Date(), getBy}
     }
 
-    let error
-    // if (lastValue !== undefined) {
-    // console.log(lastValue)
-    if (lastValue) if (lastValue.text === text) throw 'Nothing new'
-    // } else if (text === undefined) error = 'Text is undefined'
+    if (lastValue) if (lastValue.text === text) throw {error: 'Nothing new', date: new Date(), getBy}
 
-    //if (error) throw {error, date: new Date(), getBy}
-
-    const translated = await translateFromText(text, allQuestions)
+    const translated = translateFromText(text, allQuestions)
     return {
         text,
         translated,
