@@ -54,7 +54,7 @@ const getText = async (array, clipboard, textFromInput) => {
             clipboard.writeText(textFromInput)
             return textFromInput
         }
-        getBy = 'getTextFromInput'
+        getBy = 'getTextFromInput ⌨️'
     } else if (clipboard.readText() === '') {
         getTextFun = getTextFromClipImg
         getBy = 'getTextFromClipImg 📷'

@@ -39,11 +39,11 @@ app.whenReady().then(() => {
 
     let timeout
     let textFromInput
+    ipcMain.on('input', (_, data) => textFromInput = data)
 
     const recursive = () => {
         timeout = null
 
-        ipcMain.once('input', (_, data) => textFromInput = data)
         getText(resultsArray, clipboard, textFromInput)
             .then(res => {
                 resultsArray.push(res.text)
