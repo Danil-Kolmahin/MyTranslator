@@ -48,7 +48,7 @@ app.whenReady().then(() => {
             .then(res => {
                 resultsArray.push(res.text)
                 //console.log(resultsArray[resultsArray.length - 1])
-                win.webContents.send('wantLog', res.translated)
+                win.webContents.send('wantLog', res)
             })
             .catch(err => {
                 errorsArray.push(err)
