@@ -1,8 +1,8 @@
 const {createWorker} = require('tesseract.js')
 // const translate = require('@vitalets/google-translate-api')
-const {takeQuestions} = require("./textWork");
-const {searchAndColor} = require("./textWork");
-const {search} = require("./textWork");
+const {takeQuestions} = require("./textWork")
+const {searchAndColor} = require("./textWork")
+const {search} = require("./textWork")
 
 const translateFromText = (findStr) => {
     //const { text } = await translate(findStr, {to: 'uk'})
@@ -19,27 +19,13 @@ const translateFromText = (findStr) => {
 }
 
 const getTextFromClipImg = async function (clipboard) {
-    let img
-    try {
-        img = clipboard.readImage().toJPEG(70)
-    } catch (e) {
-        console.error(e)
-    }
+    let img = clipboard.readImage().toJPEG(70)
     const worker = createWorker()
     await worker.load()
     await worker.loadLanguage('ukr')
     await worker.initialize('ukr')
-    let all = {
-        data: {
-            text: ''
-        }
-    }
-    try {
-        all = await worker.recognize(img)
-    } finally {
-        await worker.terminate()
-    }
-    return {text: all.data.text, error: ''}
+    const res = await worker.recognize(img)
+    return {text: res && res.data && res.data.text.slice(0, res.data.text.length - 1), error: ''}
 }
 
 const getTextFromClipText = function (clipboard) {
